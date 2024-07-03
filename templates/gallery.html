@@ -1,14 +1,51 @@
 <!-- gallery.html -->
-{% extends "base.html" %}
-{% block content %}
-<div class="p-4">
-    <h1 class="text-2xl font-bold mb-4">Gallery</h1>
-    <div class="flex overflow-x-auto space-x-4 p-4">
-        {% for image in images %}
-            <div class="flex-shrink-0 w-64 h-64">
-                <img src="{{ url_for('static', filename='uploads/' + image.path) }}" alt="Adventure image" class="w-full h-full object-cover rounded-lg shadow-lg">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Couples Adventure Gallery</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .golden-ratio {
+            height: 61.8vh;
+        }
+        .messages-container {
+            height: 38.2vh;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col">
+    <div class="container mx-auto p-4 flex-grow flex flex-col">
+        <h1 class="text-3xl font-bold mb-4 text-center">Our Adventure Gallery</h1>
+        <div class="relative w-full max-w-4xl mx-auto golden-ratio flex flex-col">
+            <div class="flex-grow relative overflow-hidden rounded-lg shadow-lg">
+                {% for image in images %}
+                    <div class="absolute inset-0 w-full h-full transition-opacity duration-500 ease-in-out" id="image-{{ loop.index0 }}" style="opacity: {% if loop.first %}1{% else %}0{% endif %};">
+                        <img src="{{ url_for('static', filename='uploads/' + image.path) }}" alt="Adventure image" class="w-full h-full object-contain">
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+            <div class="absolute inset-x-0 top-1/2 transform -translate-y-1/2 flex justify-between items-center px-4">
+                <button onclick="moveSlide(-1)" class="bg-blue-500 text-white p-2 rounded-full opacity-75 hover:opacity-100 transition-opacity">&lt;</button>
+                <button onclick="moveSlide(1)" class="bg-blue-500 text-white p-2 rounded-full opacity-75 hover:opacity-100 transition-opacity">&gt;</button>
+            </div>
+        </div>
+        <div id="messages-container" class="messages-container mt-4 overflow-y-auto" hx-trigger="load" hx-get="/messages/{{ images[0].id }}">
+            <!-- Messages will be loaded here -->
+        </div>
     </div>
-</div>
-{% endblock %}
+    <script>
+        let currentIndex = 0;
+        const imageIds = [{% for image in images %}'{{ image.id }}'{% if not loop.last %}, {% endif %}{% endfor %}];
+
+        function moveSlide(direction) {
+            document.getElementById(`image-${currentIndex}`).style.opacity = 0;
+            currentIndex = (currentIndex + direction + imageIds.length) % imageIds.length;
+            document.getElementById(`image-${currentIndex}`).style.opacity = 1;
+            htmx.ajax('GET', `/messages/${imageIds[currentIndex]}`, '#messages-container');
+        }
+    </script>
+</body>
+</html>

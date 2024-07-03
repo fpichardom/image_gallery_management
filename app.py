@@ -9,6 +9,7 @@ import os
 import uuid
 from datetime import datetime, timezone
 import sys
+from flask import jsonify
 
 
 app = Flask(__name__)
@@ -61,6 +62,45 @@ def gallery():
     #    app.logger.debug(f"Image: {img}")
 
     return render_template('gallery.html', images=images)
+
+
+@app.route('/messages/<image_id>')
+def get_messages_html(image_id):
+    stmt = sa.select(Message).where(Message.image_id == image_id).order_by(Message.timestamp.desc())
+    messages = db.session.scalars(stmt).all()
+    return render_template('messages_partial.html', messages=messages)
+
+
+#@app.route('/api/images')
+@app.route('/api/gallery-data')
+def get_gallery_data():
+#def get_images():
+    stmt = sa.select(Image).order_by(Image.timestamp.desc())
+    images = db.session.scalars(stmt).all()
+    
+    image_data = []
+    for img in images:
+        messages = [{"author": msg.author, "content": msg.content} for msg in img.messages]
+        image_data.append({"id": img.id, "path": img.path, "messages": messages})
+    
+    #image_data = [{"id": img.id, "path": img.path} for img in images]
+    
+    return jsonify(image_data)
+
+@app.route('/api/images')
+def get_images():
+    stmt = sa.select(Image).order_by(Image.timestamp.desc())
+    images = db.session.scalars(stmt).all()
+    return jsonify([{"id": img.id, "path": img.path} for img in images])
+
+@app.route('/api/messages/<image_id>')
+def get_messages(image_id):
+    stmt = sa.select(Message).where(Message.image_id == image_id).order_by(Message.timestamp.desc())
+    messages = db.session.scalars(stmt).all()
+    return jsonify([{"author": msg.author, "content": msg.content} for msg in messages])
+
+
+
 
 
 @app.route('/upload', methods=['GET', 'POST'])

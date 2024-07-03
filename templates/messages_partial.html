@@ -1,0 +1,14 @@
+<!-- messages_partial.html -->
+{% if messages %}
+    <div class="bg-white p-4 rounded-lg shadow">
+        {% for message in messages %}
+            <div class="mb-2">
+                <strong>{{ message.author }}:</strong> {{ message.content }}
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center text-gray-500">
+        No messages for this image.
+    </div>
+{% endif %}
