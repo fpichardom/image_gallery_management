@@ -8,6 +8,7 @@ from typing import List, Optional
 import os
 import uuid
 from datetime import datetime, timezone
+import sys
 
 
 app = Flask(__name__)
@@ -121,4 +122,10 @@ def add_message(image_id):
     return render_template('add_message.html', image=image)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    if len(sys.argv) > 1 and sys.argv[1] == 'reset-db':
+        with app.app_context():
+            db.drop_all()
+            db.create_all()
+            print("All tables dropped and recreated successfully!")
+    else:
+        app.run(debug=True)
