@@ -27,6 +27,14 @@ class Image(db.Model):
         index=True, default=lambda: datetime.now(timezone.utc))
     messages:so.WriteOnlyMapped['Message'] = so.relationship(back_populates='image')
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'filename': self.filename,
+            'path': self.path,
+            'timestamp': self.timestamp
+        }
+
 class Message(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     content: so.Mapped[str] = so.mapped_column(sa.Text, nullable=False)
@@ -45,6 +53,13 @@ def landing():
 def gallery():
     stmt = sa.select(Image).order_by(Image.timestamp.desc())
     images = db.session.scalars(stmt).all()
+    #image_data = [{"id": img.id, "path": img.path} for img in images]
+    
+    # Debug logging
+    #app.logger.debug(f"Number of images fetched: {len(image_data)}")
+    #for img in image_data:
+    #    app.logger.debug(f"Image: {img}")
+
     return render_template('gallery.html', images=images)
 
 
@@ -81,6 +96,7 @@ def batch_upload():
                 full_path = os.path.join(app.config['UPLOAD_FOLDER'], relative_path)
                 os.makedirs(os.path.dirname(full_path), exist_ok=True)
                 file.save(full_path)
+
                 new_image = Image(id=image_id, filename=filename, path=relative_path)
                 db.session.add(new_image)
         db.session.commit()
@@ -97,7 +113,7 @@ def thumbnail_view():
 @app.route('/add_message/<image_id>', methods=['GET', 'POST'])
 def add_message(image_id):
     stmt = sa.select(Image).where(Image.id == image_id)
-    image = db.session.scalars(stmt)
+    image = db.session.scalar(stmt)
     if image is None:
         flash('Image not found', 'error')
         return redirect(url_for('thumbnail_view'))
@@ -109,17 +125,13 @@ def add_message(image_id):
         db.session.add(new_message)
         db.session.commit()
         flash('Message added successfully', 'success')
-        return redirect(url_for('thumbnail_view'))
+        return redirect(url_for('add_message', image_id=image_id))
+    
+    # Fetch messages for this image
+    message_stmt = sa.select(Message).where(Message.image_id == image_id).order_by(Message.timestamp.desc())
+    messages = db.session.scalars(message_stmt).all()
 
-    if request.method == 'POST':
-        content = request.form['content']
-        author = request.form['author']
-        new_message = Message(content=content, author=author, image_id=image_id)
-        db.session.add(new_message)
-        db.session.commit()
-        flash('Message added successfully', 'success')
-        return redirect(url_for('thumbnail_view'))
-    return render_template('add_message.html', image=image)
+    return render_template('add_message.html', image=image, messages=messages)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == 'reset-db':

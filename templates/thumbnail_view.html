@@ -5,7 +5,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
     {% for image in images %}
     <div class="bg-white p-4 rounded-lg shadow-md">
-        <img src="{{ url_for('static', filename=image.path) }}" alt="Adventure image" class="w-full h-48 object-cover rounded-lg mb-2">
+        <img src="{{ url_for('static', filename='uploads/' + image.path) }}" alt="Adventure image" class="w-full h-48 object-cover rounded-lg mb-2">
         <a href="{{ url_for('add_message', image_id=image.id) }}" class="block text-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add Message</a>
     </div>
     {% endfor %}

@@ -4,7 +4,7 @@
 <h1 class="text-3xl font-bold mb-4">Add Message to Image</h1>
 <div class="flex">
     <div class="w-1/2 pr-4">
-        <img src="{{ url_for('static', filename=image.path) }}" alt="Adventure image" class="w-full rounded-lg shadow-md">
+        <img src="{{ url_for('static', filename='uploads/' + image.path) }}" alt="Adventure image" class="w-full rounded-lg shadow-md">
     </div>
     <div class="w-1/2 pl-4">
         <form action="{{ url_for('add_message', image_id=image.id) }}" method="post" class="bg-white p-6 rounded-lg shadow-md">
@@ -20,7 +20,7 @@
         </form>
         <div class="mt-4">
             <h2 class="text-xl font-bold mb-2">Existing Messages:</h2>
-            {% for message in image.messages %}
+            {% for message in messages %}
             <div class="bg-gray-100 p-2 rounded mb-2">
                 <p><strong>{{ message.author }}:</strong> {{ message.content }}</p>
             </div>
