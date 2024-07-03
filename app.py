@@ -1,13 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from werzeug.utils import secure_filename
+from werkzeug.utils import secure_filename
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 from typing import List, Optional
 import os
 import uuid
 from datetime import datetime, timezone
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///couples_gallery.db'
