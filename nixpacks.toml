@@ -1,0 +1,4 @@
+[default]
+build = ["pip install -r requirements.txt"]
+start = "python app.py"
+init = "python -c 'from app import db; db.create_all()'"
