@@ -94,7 +94,7 @@ def thumbnail_view():
     images = db.session.scalars(stmt).all()
     return render_template('thumbnail_view.html', images=images)
 
-@app.route('add_message/<image_id>', methods=['GET', 'POST'])
+@app.route('/add_message/<image_id>', methods=['GET', 'POST'])
 def add_message(image_id):
     stmt = sa.select(Image).where(Image.id == image_id)
     image = db.session.scalars(stmt)
