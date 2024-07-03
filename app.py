@@ -55,12 +55,12 @@ def upload():
         if file:
             filename = secure_filename(file.filename)
             image_id = str(uuid.uuid4())
-            image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_id)
-            os.makedirs(image_path, exist_ok=True)
-            file_path = os.path.join(image_path, filename)
-            file.save(file_path)
+            relative_path = os.path.join(image_id, filename)
+            full_path = os.path.join(app.config['UPLOAD_FOLDER'], relative_path)
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
+            file.save(full_path)
 
-            new_image = Image(id=image_id, filename=filename, path=file_path)
+            new_image = Image(id=image_id, filename=filename, path=relative_path)
             db.session.add(new_image)
             db.session.commit()
 
@@ -76,12 +76,11 @@ def batch_upload():
             if file:
                 filename = secure_filename(file.filename)
                 image_id = str(uuid.uuid4())
-                image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_id)
-                os.makedirs(image_path, exist_ok=True)
-                file_path = os.path.join(image_path, filename)
-                file.save(file_path)
-
-                new_image = Image(id=image_id, filename=filename, path=file_path)
+                relative_path = os.path.join(image_id, filename)
+                full_path = os.path.join(app.config['UPLOAD_FOLDER'], relative_path)
+                os.makedirs(os.path.dirname(full_path), exist_ok=True)
+                file.save(full_path)
+                new_image = Image(id=image_id, filename=filename, path=relative_path)
                 db.session.add(new_image)
         db.session.commit()
         flash('All images uploaded successfully', 'success')
