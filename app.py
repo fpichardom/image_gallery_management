@@ -180,5 +180,7 @@ if __name__ == '__main__':
             db.create_all()
             print("All tables dropped and recreated successfully!")
     else:
-        db.create_all()
+        with app.app_context():
+            db.create_all()
+            print("All tables created successfully!")
         app.run(host='0.0.0.0', port=3000)
