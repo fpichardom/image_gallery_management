@@ -1,0 +1,36 @@
+<!-- base.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Monica & Fritz Adventure Gallery</title>
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <script src="https://unpkg.com/alpinejs@3.13.5/dist/cdn.min.js" defer></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+  <nav class="bg-blue-500 p-4 text-white">
+    <div class="container mx-auto">
+      <a href="{{ url_for('landing') }}" class="text-2xl font-bold">Journey Adventure Gallery</a>
+      <a href="{{ url_for('gallery') }}" class="ml-4">Gallery</a>
+      <a href="{{ url_for('upload') }}" class="ml-4">Upload</a>
+      <a href="{{ url_for('batch_upload') }}" class="ml-4">Batch Upload</a>
+      <a href="{{ url_for('thumbnail_view') }}" class="ml-4">Manage Images</a>
+    </div>
+  </nav>
+  <div class="container mx-auto">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="bg-{{ 'green' if category == 'success' else 'red' }}-100 border border-{{ 'green' if category == 'success' else 'red' }}-400 text-{{ 'green' if category == 'success' else 'red' }}-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">{{message}}</span>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

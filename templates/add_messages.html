@@ -1,0 +1,31 @@
+<!-- add_message.html -->
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-4">Add Message to Image</h1>
+<div class="flex">
+    <div class="w-1/2 pr-4">
+        <img src="{{ url_for('static', filename=image.path) }}" alt="Adventure image" class="w-full rounded-lg shadow-md">
+    </div>
+    <div class="w-1/2 pl-4">
+        <form action="{{ url_for('add_message', image_id=image.id) }}" method="post" class="bg-white p-6 rounded-lg shadow-md">
+            <div class="mb-4">
+                <label for="author" class="block text-gray-700 font-bold mb-2">Your Name:</label>
+                <input type="text" name="author" id="author" required class="border p-2 w-full rounded">
+            </div>
+            <div class="mb-4">
+                <label for="content" class="block text-gray-700 font-bold mb-2">Your Message:</label>
+                <textarea name="content" id="content" required class="border p-2 w-full rounded h-32"></textarea>
+            </div>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add Message</button>
+        </form>
+        <div class="mt-4">
+            <h2 class="text-xl font-bold mb-2">Existing Messages:</h2>
+            {% for message in image.messages %}
+            <div class="bg-gray-100 p-2 rounded mb-2">
+                <p><strong>{{ message.author }}:</strong> {{ message.content }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+<!-- batch_upload.html -->
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-4">Batch Upload Images</h1>
+<form action="{{ url_for('batch_upload') }}" method="post" enctype="multipart/form-data" class="bg-white p-6 rounded-lg shadow-md">
+    <div class="mb-4">
+        <label for="files" class="block text-gray-700 font-bold mb-2">Choose multiple images:</label>
+        <input type="file" name="files" id="files" accept="image/*" multiple required class="border p-2 w-full">
+    </div>
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Upload Images</button>
+</form>
+{% endblock %}
