@@ -4,48 +4,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Couples Adventure Gallery</title>
+    <title>Our Adventurous Journey</title>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+        }
         .golden-ratio {
             height: 61.8vh;
         }
         .messages-container {
             height: 38.2vh;
         }
+        .image-fade {
+            transition: opacity 0.5s ease-in-out;
+        }
     </style>
 </head>
-<body class="bg-gray-100 h-screen flex flex-col">
-    <div class="container mx-auto p-4 flex-grow flex flex-col">
-        <h1 class="text-3xl font-bold mb-4 text-center">Our Adventure Gallery</h1>
+<body class="h-screen flex flex-col overflow-hidden">
+    <div class="container mx-auto p-4 flex flex-col h-full">
+        <h1 class="text-4xl font-bold mb-6 text-center text-purple-800 shadow-text">Nuestras Aventuras Juntos</h1>
         <div class="relative w-full max-w-4xl mx-auto golden-ratio flex flex-col">
-            <div class="flex-grow relative overflow-hidden rounded-lg shadow-lg">
+            <div class="flex-grow relative overflow-hidden rounded-lg shadow-xl bg-white">
                 {% for image in images %}
-                    <div class="absolute inset-0 w-full h-full transition-opacity duration-500 ease-in-out" id="image-{{ loop.index0 }}" style="opacity: {% if loop.first %}1{% else %}0{% endif %};">
+                    <div class="absolute inset-0 w-full h-full image-fade" id="image-{{ loop.index0 }}" style="opacity: {% if loop.first %}1{% else %}0{% endif %};">
                         <img src="{{ url_for('static', filename='uploads/' + image.path) }}" alt="Adventure image" class="w-full h-full object-contain">
                     </div>
                 {% endfor %}
             </div>
             <div class="absolute inset-x-0 top-1/2 transform -translate-y-1/2 flex justify-between items-center px-4">
-                <button onclick="moveSlide(-1)" class="bg-blue-500 text-white p-2 rounded-full opacity-75 hover:opacity-100 transition-opacity">&lt;</button>
-                <button onclick="moveSlide(1)" class="bg-blue-500 text-white p-2 rounded-full opacity-75 hover:opacity-100 transition-opacity">&gt;</button>
+                <button onclick="moveSlide(-1)" class="bg-purple-600 text-white p-3 rounded-full opacity-75 hover:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-purple-500">&lt;</button>
+                <button onclick="moveSlide(1)" class="bg-purple-600 text-white p-3 rounded-full opacity-75 hover:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-purple-500">&gt;</button>
             </div>
         </div>
-        <div id="messages-container" class="messages-container mt-4 overflow-y-auto" hx-trigger="load" hx-get="/messages/{{ images[0].id }}">
+        <div id="messages-container" class="messages-container mt-6 overflow-y-auto bg-white rounded-lg shadow-xl p-4" hx-trigger="load" hx-get="/messages/{{ images[0].id }}">
             <!-- Messages will be loaded here -->
         </div>
     </div>
     <script>
         let currentIndex = 0;
         const imageIds = [{% for image in images %}'{{ image.id }}'{% if not loop.last %}, {% endif %}{% endfor %}];
+        const totalImages = imageIds.length;
 
         function moveSlide(direction) {
-            document.getElementById(`image-${currentIndex}`).style.opacity = 0;
-            currentIndex = (currentIndex + direction + imageIds.length) % imageIds.length;
+            const oldIndex = currentIndex;
+            currentIndex = (currentIndex + direction + totalImages) % totalImages;
+            
+            document.getElementById(`image-${oldIndex}`).style.opacity = 0;
             document.getElementById(`image-${currentIndex}`).style.opacity = 1;
+            
             htmx.ajax('GET', `/messages/${imageIds[currentIndex]}`, '#messages-container');
         }
+
+        // Preload images
+        imageIds.forEach((id, index) => {
+            if (index !== 0) {  // First image is already loaded
+                const img = new Image();
+                img.src = document.getElementById(`image-${index}`).querySelector('img').src;
+            }
+        });
     </script>
 </body>
 </html>
